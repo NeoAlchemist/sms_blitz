@@ -17,7 +17,7 @@ defmodule SmsBlitz.Adapters.Plivo do
       text: message,
       type: "sms",
       log: true
-    } |> Poison.encode!
+    } |> Jason.encode!
 
     {:ok, %{body: resp, status_code: status_code}} = HTTPoison.post(
       uri,
@@ -28,7 +28,7 @@ defmodule SmsBlitz.Adapters.Plivo do
       ]
     )
 
-    {:ok, %{"api_id" => api_id, "message" => message}} = Poison.decode(resp)
+    {:ok, %{"api_id" => api_id, "message" => message}} = Jason.decode(resp)
 
     %{
       id: api_id,

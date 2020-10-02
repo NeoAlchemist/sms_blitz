@@ -3,6 +3,8 @@ defmodule SmsBlitz.Adapters.Twilio do
   @base_uri "https://api.twilio.com/2010-04-01/Accounts"
 
   defmodule Config do
+    @derive Jason.Encoder
+
     defstruct [:uri, :account_sid, :token]
     @type t :: %__MODULE__{}
   end
@@ -30,7 +32,7 @@ defmodule SmsBlitz.Adapters.Twilio do
   end
 
   defp handle_response(%HTTPoison.Response{body: resp, status_code: status_code}) do
-    resp_json = Poison.decode!(resp)
+    resp_json = Jason.decode!(resp)
     %{
       id: resp_json["sid"],
       result_string: resp_json["error_message"] || resp_json["body"],

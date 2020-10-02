@@ -3,6 +3,8 @@ defmodule SmsBlitz.Adapters.Nexmo do
   @base_uri "https://rest.nexmo.com/sms/json"
 
   defmodule Config do
+    @derive Jason.Encoder
+
     defstruct [:uri, :api_key, :api_secret]
     @type t :: %__MODULE__{}
   end
@@ -32,14 +34,14 @@ defmodule SmsBlitz.Adapters.Nexmo do
         api_key: conf.api_key,
         api_secret: conf.api_secret
       }
-      |> Poison.encode!()
+      |> Jason.encode!()
 
     HTTPoison.post(conf.uri, body, [{"Content-Type", "application/json"}])
     |> handle_response!
   end
 
   defp handle_response!({:ok, %{headers: headers, body: resp, status_code: 200}}) do
-    handle_messages(headers, Poison.decode!(resp))
+    handle_messages(headers, Jason.decode!(resp))
   end
 
   defp handle_messages(_, %{"messages" => [%{"status" => status, "message-id" => message_id}]})
